@@ -1,7 +1,7 @@
 # DSH Desktop and Plugins
 
 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)（`dsh`）的 Windows 桌面外壳，
-以及配套的两个系统提示词插件。
+以及配套的系统提示词插件。
 
 > **非官方项目**，与 DeepSeek 无隶属关系，也未获其背书。
 
@@ -10,7 +10,7 @@
 | 目录 | 内容 |
 |---|---|
 | [`desktop/`](desktop/) | 桌面端：内置 Node.js 运行时与完整 `dsh` 包，双击即用的 Electron 应用 |
-| [`plugins/`](plugins/) | 两个 `dsh` 插件：`dsh-global-prompt`、`dsh-session-prompt` |
+| [`plugins/`](plugins/) | `dsh` 插件：`dsh-session-prompt` |
 
 ---
 
@@ -29,14 +29,18 @@
 
 | 插件 | 作用 | 作用域 |
 |---|---|---|
-| `dsh-global-prompt` | 在系统提示词开头注入一段全局提示词 | 所有会话 |
 | `dsh-session-prompt` | 在系统提示词开头注入一段提示词 | 仅当前会话 |
 
-两者都在输入框工具行加一个按钮，文本作为系统提示词的**一个 section** 注入，而不是追加到
+它在输入框工具行加一个按钮，文本作为系统提示词的**一个 section** 注入，而不是追加到
 对话历史里 —— 因此不污染会话记录，前缀保持稳定以利于 KV 缓存复用，且改动在下一个模型请求
 即生效、无需重启。
 
-安装与验证说明见各插件目录下的 `README.md`。
+> 更早的 `dsh-global-prompt`（一份文本作用于**所有**会话）已被 `dsh-session-prompt` 取代：
+> 按会话独立的粒度才是这个功能该有的样子，且旧版缺少按会话覆盖的能力。旧版已从本仓库移除，
+> 但 `dsh-session-prompt` 的安装脚本**仍会自动清理**机器上遗留的旧版安装——否则它会把全局
+> 提示词继续注入每一个会话。
+
+安装与验证说明见插件目录下的 `README.md`。
 
 ---
 
