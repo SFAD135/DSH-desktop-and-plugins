@@ -9,8 +9,8 @@
  * invariants that fail loudly instead of subtly:
  *
  *   - coverage is always finite and within 0..1, for every icon size in use;
- *   - the nonzero winding rule really produces holes, since the mark's eye and belly
- *     notch depend on it; and
+ *   - the nonzero winding rule really produces holes, since a mark's cut-outs depend
+ *     on it (asserted below with fixtures; the shipped mark itself has no holes); and
  *   - an unimplemented path command throws rather than drawing something wrong.
  *
  * Usage: node scripts/test-svg-path.mjs
@@ -110,12 +110,16 @@ check('a half-canvas rect covers the inside fully', at(half, 5, 10) === 1, Strin
 check('a half-canvas rect covers the outside not at all', at(half, 15, 10) === 0, String(at(half, 15, 10)));
 
 // ── the invariant that the 48 px bug violated ───────────────────────────────
-const svg = readFileSync(path.join(ROOT, 'assets', 'deepseek-mark.svg'), 'utf8');
+const svg = readFileSync(path.join(ROOT, 'assets', 'app-mark.svg'), 'utf8');
 const pathData = /<path[^>]*\bd="([^"]+)"/u.exec(svg)?.[1] ?? '';
-check('the mark asset still has a path', pathData.length > 1000, `${pathData.length} chars`);
+// A length floor only guards against a truncated or empty asset, which is why it is far
+// lower than it once was: the mark is built from straight segments, so it is ~119
+// characters of coordinates where the whale it replaced was thousands of flattened curves.
+check('the mark asset still has a path', pathData.length > 100, `${pathData.length} chars`);
 
 const mark = parsePath(pathData, { tolerance: 0.02 });
-check('the mark parses into four contours', mark.length === 4, String(mark.length));
+// The shipped mark is two shapes: the chevron, and the cursor block beside it.
+check('the mark parses into two contours', mark.length === 2, String(mark.length));
 const markBox = pathBounds(mark);
 check('the mark fits its 50x50 viewBox',
   markBox.minX >= 0 && markBox.minY >= 0 && markBox.maxX <= 50 && markBox.maxY <= 50,
@@ -147,7 +151,11 @@ for (const size of [16, 24, 32, 48, 64, 128, 256, 512]) {
 const detail = renderMark(mark, { resolution: 256, scale: 0.62, subSamples: 8 }).mask;
 const covered = detail.reduce((sum, value) => sum + (value > 0.5 ? 1 : 0), 0);
 const ratio = covered / detail.length;
-check('the mark covers a plausible fraction of its box', ratio > 0.12 && ratio < 0.45, `ratio=${ratio.toFixed(3)}`);
+// The bound only has to separate "drawn" from "blank" and from "solid". It was
+// 0.12..0.45 while the mark was the solid whale; the prompt mark is a stroked glyph and
+// measures ~0.10 here, so the floor moved with the artwork. The ceiling still catches a
+// blob that filled its box.
+check('the mark covers a plausible fraction of its box', ratio > 0.06 && ratio < 0.45, `ratio=${ratio.toFixed(3)}`);
 
 process.stdout.write(`\n${checks - failures}/${checks} checks passed\n`);
 process.exit(failures === 0 ? 0 : 1);

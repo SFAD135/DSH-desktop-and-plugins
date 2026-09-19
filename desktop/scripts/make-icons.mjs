@@ -5,11 +5,12 @@
  *   build/icon.png        512x512 PNG (window + tray icon)
  *   build/icon.ico        multi-size ICO (16/24/32/48/64/128/256) for the launcher and installer
  *   app/assets/icon.png   copy used at runtime
- *   docs/deepseek-icon.png  standalone 512x512 PNG, for use as an icon elsewhere
+ *   docs/app-icon.png     standalone 512x512 PNG, for use as an icon elsewhere
  *
- * The artwork is the **real DeepSeek whale** — `assets/deepseek-mark.svg`, the same
- * vector the Harness web frontend ships as its favicon — drawn on a rounded app tile.
- * It replaces an earlier hand-drawn approximation that shipped as a cartoon fish.
+ * The artwork is this project's own mark — `assets/app-mark.svg`, a terminal prompt —
+ * drawn on a rounded app tile. It replaced the upstream DeepSeek whale that an earlier
+ * revision copied from the Harness web frontend's favicon: this project is unaffiliated
+ * with DeepSeek, and MIT grants copyright only, never trademark rights.
  *
  * Rasterization is done here rather than by a dependency: `scripts/svg-path.mjs`
  * flattens the mark's Bézier curves and fills them with the nonzero winding rule,
@@ -99,10 +100,10 @@ const VARIANTS = {
 };
 
 // ── the mark ────────────────────────────────────────────────────────────────
-const svg = readFileSync(path.join(ROOT, 'assets', 'deepseek-mark.svg'), 'utf8');
+const svg = readFileSync(path.join(ROOT, 'assets', 'app-mark.svg'), 'utf8');
 const pathData = /<path[^>]*\bd="([^"]+)"/u.exec(svg)?.[1];
 if (pathData === undefined) {
-  process.stderr.write('[icons] assets/deepseek-mark.svg has no <path d="...">\n');
+  process.stderr.write('[icons] assets/app-mark.svg has no <path d="...">\n');
   process.exit(1);
 }
 // The mark lives in a 50x50 viewBox, so 0.02 units is about a fifth of a pixel at
@@ -349,7 +350,7 @@ function writeSheet() {
  * The same artwork at the sizes it will actually be seen at, zoomed by a single
  * integer factor so relative legibility is preserved.
  *
- * This exists because "does the whale survive 16 px?" is the only question that
+ * This exists because "does the mark survive 16 px?" is the only question that
  * matters for a tray and title-bar icon and it cannot be answered from the 512 px
  * render — the small entries are where a mark turns to mush.
  */
@@ -415,11 +416,11 @@ if (process.argv.includes('--sheet')) {
   const png = toPng(big, 512);
   writeFileSync(path.join(ROOT, 'build', 'icon.png'), png);
   writeFileSync(path.join(ROOT, 'app', 'assets', 'icon.png'), png);
-  writeFileSync(path.join(ROOT, 'docs', 'deepseek-icon.png'), png);
+  writeFileSync(path.join(ROOT, 'docs', 'app-icon.png'), png);
   writeFileSync(path.join(ROOT, 'build', 'icon.ico'), toIco(images));
   process.stdout.write(
     `[icons] variant=${variantName}; mark ${markBounds.width.toFixed(1)}x${markBounds.height.toFixed(1)} units; ` +
-      `wrote build/icon.png (${(png.length / 1024).toFixed(1)} KB), app/assets/icon.png, docs/deepseek-icon.png, ` +
+      `wrote build/icon.png (${(png.length / 1024).toFixed(1)} KB), app/assets/icon.png, docs/app-icon.png, ` +
       `build/icon.ico (${SIZES.join('/')})\n`,
   );
 }

@@ -12,7 +12,7 @@
 node_modules/
 
 # ── regenerated from tracked assets on every build ──────────────────────────
-# `npm run icons` rasterizes assets/deepseek-mark.svg; the output is deterministic, so
+# `npm run icons` rasterizes assets/app-mark.svg; the output is deterministic, so
 # these only appear here because they are outputs, not because they churn.
 # docs/ is NOT ignored wholesale: README links to the screenshots in it.
 /app/assets/icon.png

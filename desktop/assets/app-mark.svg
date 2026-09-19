@@ -1,0 +1,29 @@
+<!--
+  The application mark: a terminal prompt — a bold chevron and a cursor block.
+
+  This is original artwork for this project, drawn as vector geometry in this file.
+  It replaces the upstream DeepSeek whale that an earlier revision copied verbatim
+  from `@deepseek-ai/dsh-web-frontend`'s favicon: this repository is an unaffiliated
+  project, and MIT grants copyright only, never trademark rights, so it must not
+  ship someone else's logo. Licensed under this repository's MIT LICENSE.
+
+  Read by scripts/make-icons.mjs, which draws it on the rounded app tile.
+
+  Geometry, so it can be re-derived rather than reverse-engineered:
+
+    - 50x50 viewBox, two contours, absolute `M`/`L`/`Z` only (the rasterizer in
+      scripts/svg-path.mjs implements exactly M/L/C/Z and throws on anything else).
+    - Chevron: the 3-point centreline (8.564,11.5) -> (24.564,25) -> (8.564,38.5)
+      stroked at half-width 3.3, with mitered joins and butt caps. Emitting that
+      stroked outline as a polygon is what the six coordinates of the first contour
+      are; the apex miter reaches x=29.681.
+    - Cursor: a 12.5 x 6.6 rectangle, x 31.064..43.564, y 32.4..39. Its bottom edge
+      sits on the chevron's visual baseline.
+    - The bounding box (37.128 x 32.044) is centred on (25,25). The renderer centres
+      by bounding box regardless, so this is for legibility of the file, not output.
+
+  Filled with the default nonzero winding rule. Both contours are wound the same way,
+  so the cursor is a separate solid shape rather than a hole.
+--><svg xmlns="http://www.w3.org/2000/svg" width="50.000000" height="50.000000" viewBox="0 0 50 50" fill="none">
+	<path d="M6.436 14.022L19.447 25L6.436 35.978L10.692 41.022L29.681 25L10.692 8.978ZM31.064 32.4L43.564 32.4L43.564 39L31.064 39Z" />
+</svg>

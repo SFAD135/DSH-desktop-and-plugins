@@ -2,8 +2,8 @@
 /**
  * A minimal SVG path rasterizer — just enough for the one path this project needs.
  *
- * The icon generator must draw the real DeepSeek whale rather than an approximation
- * of it, and the project deliberately carries no image or vector dependencies. The
+ * The icon generator must draw the app mark faithfully rather than approximate it,
+ * and the project deliberately carries no image or vector dependencies. The
  * mark is a single filled path, so the smallest honest implementation is: read the
  * `d` attribute, flatten its curves to line segments, and fill those with the
  * nonzero winding rule.
@@ -192,9 +192,9 @@ function pathBounds(subpaths) {
 /**
  * Rasterize subpaths into a per-pixel coverage mask (0..1, one float per pixel).
  *
- * Uses the nonzero winding rule, matching SVG's default `fill-rule`, so the mark's
- * cut-outs (the eye and the gaps in the tail) come out as holes as long as their
- * winding opposes the outer contour — which is how the source draws them.
+ * Uses the nonzero winding rule, matching SVG's default `fill-rule`. A contour wound
+ * against the one enclosing it comes out as a hole, which is how cut-outs are drawn;
+ * the current mark has no holes, but the rule is what makes that expressible.
  *
  * @param subpaths - the result of {@link parsePath}.
  * @param options - `width`/`height` in pixels, a `transform(x, y)` mapping path

@@ -261,7 +261,7 @@ open present-open (POST) -> 404; 2ms; 宿主拒绝了这个请求（宿主在该
 |---|---|
 | `构建.cmd`（双击） | 用**包内**的 Node 运行时装配并构建，不需要系统 Node.js / npm，也不联网。仅在拿到带预装配运行时的分发包时可用（即 `build\runtime` 已存在）；纯源码快照里没有它所需的内置 Node |
 | `npm run prepare:runtime` | 装配 `build/runtime` 与 `build/electron`。可重复执行（已存在则跳过），`--force` 强制重来 |
-| `npm run icons` | 生成 `build/icon.png`（512）、`build/icon.ico`（16/24/32/48/64/128/256）、`app/assets/icon.png`、`docs/deepseek-icon.png`：**真正的 DeepSeek 鲸鱼标记**（`assets/deepseek-mark.svg`，与 Harness 前端 favicon 同一份矢量）画在圆角应用砖上。纯 Node 光栅化，无第三方图像库。`--variant gradient\|blue\|light\|mark` 换底色**并把选择记进 `assets/icon-variant.txt`**（因为 `npm run build` 每次都会重新生成图标，不记下来就会被下次构建悄悄改回去），`--sheet` 只输出对比图与尺寸阶梯、不动正式图标 |
+| `npm run icons` | 生成 `build/icon.png`（512）、`build/icon.ico`（16/24/32/48/64/128/256）、`app/assets/icon.png`、`docs/app-icon.png`：把**本项目自有标记**（`assets/app-mark.svg`，一个终端提示符）画在圆角应用砖上。纯 Node 光栅化，无第三方图像库。`--variant gradient\|blue\|light\|mark` 换底色**并把选择记进 `assets/icon-variant.txt`**（因为 `npm run build` 每次都会重新生成图标，不记下来就会被下次构建悄悄改回去），`--sheet` 只输出对比图与尺寸阶梯、不动正式图标 |
 | `npm run build` | 生成图标 → 清理输出目录 → 组装便携目录 → **给内置 dsh 打运行时补丁**（见 §3.3）→ 编译启动器。`--out <dir>`（或 `$DSH_DESKTOP_DIST`）可改输出目录——**当前有实例在运行时必须用它**，因为 Windows 不会释放正在运行的 `electron-core.exe` 与内置 `node.exe`，默认输出目录无法原地清理 |
 | `npm run patch:runtime` | 给已存在的运行时树重新打补丁（`build/runtime`、`dist/…`、安装包 payload）。幂等；锚点对不上会明确报错而不是静默跳过 |
 | `npm start` | 直接用 build 产物启动（开发） |
@@ -422,7 +422,7 @@ npm run build:installer     # 组装 payload + 编译到 dist-installer/（约 5
 | `scripts/patch-runtime.mjs` | 给内置 `@deepseek-ai/dsh-native-command` 打补丁，修掉三个会让「在桌面上打开」静默失效的上游缺陷（隐藏窗口的 `windowsHide`、靠默认动词的 `Invoke-Item`、对非 ASCII 路径失效的 `file://` URL）。按「目标文本 + 可接受的旧版本」逐条改写，因此幂等、且能把打过旧版补丁的树就地升级；锚点对不上则报错退出，绝不静默跳过。`npm run build` 会调用它，`patch:runtime` 可单独执行 |
 | `scripts/prune-runtime.mjs` | 判定「运行时不需要的作者元数据」（`*.map`、`*.d.ts`/`.d.mts`/`.d.cts`）：既提供 `cpSync` 的过滤器（组装时就不复制），也提供对已建目录的清理与统计。刻意**不**动 `.md` 与非声明的 `.ts`——这部分只有约 10 MB，规则要的是「显然安全」而不是「压到最小」 |
 | `scripts/test-prune-runtime.mjs` | 裁剪规则断言（重点在「不该裁的绝不能裁」：`index.ts` 保留而 `index.d.ts` 裁掉、`index.d.tsx` 保留、正反斜杠路径一致、真实临时目录上的统计与清理） |
-| `assets/deepseek-mark.svg` | DeepSeek 鲸鱼标记，逐字节复制自内置运行时的 `@deepseek-ai/dsh-web-frontend/dist/favicon.svg`（只加了一段注明出处的注释）。50×50 viewBox，单个 path，只有绝对 `M`/`C`/`Z` 命令，按默认的 nonzero 填充规则绘制 |
+| `assets/app-mark.svg` | 本项目**自有**标记：一个终端提示符（粗 `>` 加一个光标块）。50×50 viewBox，单个 `<path>`、两条轮廓，只用到绝对 `M`/`L`/`Z`（`scripts/svg-path.mjs` 只实现 M/L/C/Z，其余命令会直接抛错而不是静默画错），按默认的 nonzero 填充规则绘制。文件头写明了完整几何参数，可重新推导。**早期版本曾逐字节复制内置运行时的 `@deepseek-ai/dsh-web-frontend/dist/favicon.svg`（DeepSeek 鲸鱼标记），已移除**：本项目与 DeepSeek 无隶属关系，MIT 只授予版权、不含商标权 |
 | `scripts/svg-path.mjs` | 极小的 SVG 路径光栅化器：`parsePath` 把 `d` 展平成闭合折线（自适应细分，深度与容差都可调），`rasterizeCoverage` 用**非零环绕规则**扫描线填充，水平方向按精确分数覆盖率抗锯齿、垂直方向按子行采样。刻意**只实现标记里真正用到的命令**，遇到别的命令直接报错而不是猜着画。不要在尺寸之间复用大尺寸蒙版做缩放——box 降采样只对整数倍成立，ICO 的 24px/48px 不整除任何 2 的幂（曾经的实现因此产出 `NaN` 覆盖，渲染成一块点阵黑方块） |
 | `scripts/make-icons.mjs` | 用上面的标记生成应用与安装包图标：圆角砖 + 品牌配色（或 `--variant` 指定的另外三种）、`--sheet` 出对比图与尺寸阶梯，并对**小尺寸做视觉放大补偿**（16/24/32px 让标记占更多面积，否则托盘上糊成一团） |
 | `scripts/png-tools.mjs` | 纯 Node 的 PNG 编解码（解码支持非隔行、8/16 位、颜色类型 0/2/3/4/6 与全部五种滤波；编码写 8 位 RGBA）。隔行与亚字节位深会**明确报错**而不是解错 |
