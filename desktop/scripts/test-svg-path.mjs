@@ -125,6 +125,16 @@ check('the mark fits its 50x50 viewBox',
   markBox.minX >= 0 && markBox.minY >= 0 && markBox.maxX <= 50 && markBox.maxY <= 50,
   JSON.stringify(markBox));
 
+// The splash page draws the same mark inline, so the two must not drift. They did once:
+// the asset became the window icon while loading.html went on drawing a hand-drawn whale,
+// which nobody noticed because nothing compared them.
+const splash = readFileSync(path.join(ROOT, 'app', 'loading.html'), 'utf8');
+const contoursOf = (d) => d.split('M').filter((part) => part.length > 0).map((part) => `M${part}`);
+const splashContours = [...splash.matchAll(/<path\s+d="([^"]+)"/gu)].map((match) => match[1]);
+check('the splash page draws the same mark as the asset',
+  JSON.stringify(splashContours) === JSON.stringify(contoursOf(pathData)),
+  `splash=${JSON.stringify(splashContours)} asset=${JSON.stringify(contoursOf(pathData))}`);
+
 // Every size the icon generator emits, including the two that do not divide a power
 // of two. These are the ones a box downsample got wrong; asserting finiteness here is
 // what stops that class of bug from coming back unnoticed.
