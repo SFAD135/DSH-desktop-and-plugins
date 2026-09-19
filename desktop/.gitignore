@@ -1,0 +1,23 @@
+# Everything below is reproducible from the tracked source. Together they are ~2.6 GB
+# against 0.7 MB of actual source, and none of it belongs in history.
+
+# ── build products ──────────────────────────────────────────────────────────
+# scripts/build.mjs output, the installer payload, and the packaged installers.
+/dist/
+/dist-installer/
+/build/
+
+# A project-local npm cache used while assembling the runtime.
+/.npm-cache/
+node_modules/
+
+# ── regenerated from tracked assets on every build ──────────────────────────
+# `npm run icons` rasterizes assets/deepseek-mark.svg; the output is deterministic, so
+# these only appear here because they are outputs, not because they churn.
+# docs/ is NOT ignored wholesale: README links to the screenshots in it.
+/app/assets/icon.png
+
+# ── local noise ─────────────────────────────────────────────────────────────
+*.log
+Thumbs.db
+Desktop.ini

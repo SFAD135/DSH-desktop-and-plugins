@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:;" />
+    <title>DeepSeek Harness — 启动中</title>
+    <style>
+      :root {
+        --bg: #0b0f17;
+        --panel: #121826;
+        --line: #1f2937;
+        --text: #e5e7eb;
+        --muted: #94a3b8;
+        --accent: #4d6bfe;
+        --accent-soft: #7c8dff;
+        --danger: #f87171;
+      }
+      * { box-sizing: border-box; }
+      html, body { height: 100%; margin: 0; }
+      body {
+        background:
+          radial-gradient(1100px 620px at 50% -10%, rgba(77, 107, 254, 0.22), transparent 60%),
+          var(--bg);
+        color: var(--text);
+        font: 14px/1.6 "Segoe UI", "Microsoft YaHei UI", "Microsoft YaHei", system-ui, sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-user-select: none;
+        user-select: none;
+      }
+      .wrap { width: min(720px, 88vw); }
+      .brand { display: flex; align-items: center; gap: 14px; justify-content: center; margin-bottom: 26px; }
+      .mark {
+        width: 52px; height: 52px; border-radius: 14px;
+        background: linear-gradient(150deg, #6d8bff, #3b5bdb 60%, #22307d);
+        display: grid; place-items: center;
+        box-shadow: 0 10px 30px rgba(77, 107, 254, 0.35);
+      }
+      .mark svg { width: 30px; height: 30px; }
+      h1 { font-size: 19px; font-weight: 600; margin: 0; letter-spacing: .2px; }
+      .sub { color: var(--muted); font-size: 12.5px; margin-top: 3px; }
+      .panel {
+        background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0)) , var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 22px 22px 18px;
+      }
+      .status { display: flex; align-items: center; gap: 11px; font-size: 14px; }
+      .spinner {
+        width: 16px; height: 16px; flex: none; border-radius: 50%;
+        border: 2px solid rgba(124, 141, 255, .25);
+        border-top-color: var(--accent-soft);
+        animation: spin .8s linear infinite;
+      }
+      .spinner.hidden { display: none; }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      .bar { height: 3px; border-radius: 3px; background: #1c2333; overflow: hidden; margin: 16px 0 14px; }
+      .bar > i { display: block; height: 100%; width: 32%; border-radius: 3px; background: linear-gradient(90deg, var(--accent), var(--accent-soft)); animation: slide 1.4s ease-in-out infinite; }
+      @keyframes slide { 0% { margin-left: -34%; } 100% { margin-left: 102%; } }
+      .facts { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; color: var(--muted); font-size: 12.5px; }
+      .facts b { color: #c7d2fe; font-weight: 500; }
+      details { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 12px; }
+      summary { cursor: pointer; color: var(--muted); font-size: 12.5px; outline: none; }
+      pre {
+        margin: 10px 0 0; max-height: 190px; overflow: auto;
+        background: #0a0e16; border: 1px solid var(--line); border-radius: 9px;
+        padding: 10px 12px; font: 11.5px/1.55 "Cascadia Mono", Consolas, monospace;
+        color: #9fb0c7; white-space: pre-wrap; word-break: break-all;
+        -webkit-user-select: text; user-select: text;
+      }
+      .actions { display: flex; gap: 9px; justify-content: flex-end; margin-top: 16px; }
+      button {
+        font: inherit; font-size: 13px; color: var(--text);
+        background: #1a2233; border: 1px solid #273449; border-radius: 9px;
+        padding: 7px 14px; cursor: pointer; transition: .15s;
+      }
+      button:hover { background: #223049; border-color: #3a4c6b; }
+      button:disabled { opacity: .6; cursor: default; }
+      button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+      button.primary:hover { background: #5b76ff; }
+      .hint { color: var(--muted); font-size: 12px; margin-top: 12px; text-align: center; }
+      .warn {
+        margin-top: 14px; padding: 12px 14px; border-radius: 11px;
+        background: rgba(251, 191, 36, .07); border: 1px solid rgba(251, 191, 36, .35);
+      }
+      .warn-title { color: #fcd34d; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 7px; }
+      .warn ul { margin: 8px 0 0; padding-left: 18px; color: #d6d3d1; font-size: 12.5px; }
+      .warn li { margin-top: 3px; -webkit-user-select: text; user-select: text; word-break: break-all; }
+      .warn-foot { color: var(--muted); font-size: 11.5px; margin-top: 9px; line-height: 1.55; }
+      .warn code { background: #0a0e16; border: 1px solid var(--line); border-radius: 5px; padding: 1px 5px; font-size: 11px; }
+      .hidden { display: none !important; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="brand">
+        <div class="mark">
+          <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <ellipse cx="15" cy="19" rx="9.5" ry="6.2" fill="#fff" />
+            <path d="M23.4 15.6c2.4-1.1 4.6-1.2 6.6-.3-1.3 1-1.7 2.3-1.6 3.7-2.5 1.9-5.1 2.2-7.6 1.1z" fill="#fff" />
+            <circle cx="11.2" cy="17.6" r="1.35" fill="#33406b" />
+            <path d="M15.4 9.6c0-1.9 1-3.2 2.6-3.9-.4 1.7.1 3 1.4 3.9z" fill="#dbe4ff" />
+          </svg>
+        </div>
+        <div>
+          <h1>DeepSeek Harness</h1>
+          <div class="sub">桌面版 · 内置 Node.js 运行时与完整 dsh 包</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="status">
+          <div class="spinner" id="spinner"></div>
+          <div id="status-text">正在启动本地 dsh 服务…</div>
+        </div>
+        <div class="bar" id="bar"><i></i></div>
+        <div class="facts">
+          <b>数据目录</b><span id="fact-home">—</span>
+          <b>profile</b><span id="fact-profile">—</span>
+          <b>运行时</b><span id="fact-runtime">—</span>
+        </div>
+
+        <div class="warn hidden" id="warn">
+          <div class="warn-title"><span>⚠</span><span id="warn-title">检测到另一个 dsh 可能正在使用同一数据</span></div>
+          <ul id="warn-list"></ul>
+          <div class="warn-foot">
+            桌面端与命令行 dsh 共用 <code>~/.dsh</code> 与同一个 profile。两边同时打开会互相影响（插件补丁会被对方实时重载），建议同一时间只开一个。
+          </div>
+        </div>
+
+        <details id="log-details">
+          <summary>查看启动日志</summary>
+          <pre id="log">（暂无输出）</pre>
+        </details>
+
+        <div class="actions">
+          <button id="btn-hosts">重新检测</button>
+          <button id="btn-retry" class="hidden">重试启动</button>
+          <button id="btn-logs">打开日志</button>
+          <button id="btn-quit">退出</button>
+        </div>
+        <div class="hint" id="hint">首次启动需要初始化 profile，可能需要几秒钟。</div>
+      </div>
+    </div>
+
+    <script>
+      const $ = (id) => document.getElementById(id);
+      const shell = window.dshShell;
+      let slowTimer = null;
+
+      function renderConcurrency(concurrency) {
+        const warn = $('warn');
+        const title = $('warn-title');
+        const list = $('warn-list');
+        list.replaceChildren();
+        const addItem = (text) => {
+          const li = document.createElement('li');
+          li.textContent = text;
+          list.appendChild(li);
+        };
+        if (concurrency && concurrency.conflict) {
+          title.textContent = '检测到另一个 dsh 可能正在使用同一数据';
+          for (const item of concurrency.detail || []) addItem(item);
+          if (!concurrency.scanAvailable) addItem(`（进程扫描不可用：${String(concurrency.scanError || '').trim() || '未知原因'}，端口检测结果仍然有效）`);
+          warn.classList.remove('hidden');
+          return;
+        }
+        if (concurrency && !concurrency.scanAvailable) {
+          title.textContent = '并发检测不完整';
+          addItem(`进程扫描不可用：${String(concurrency.scanError || '').trim() || '未知原因'}`);
+          warn.classList.remove('hidden');
+          return;
+        }
+        warn.classList.add('hidden');
+      }
+
+      function render(snapshot) {
+        if (!snapshot) return;
+        $('status-text').textContent = snapshot.message || '启动中…';
+        $('fact-home').textContent = snapshot.dshHome
+          ? `${snapshot.dshHome}${
+              snapshot.dataRoot
+                ? '（本安装目录内）'
+                : snapshot.homeShared
+                  ? '（与命令行 dsh 共享）'
+                  : '（自定义 DSH_HOME）'
+            }`
+          : '—';
+        $('fact-profile').textContent = snapshot.profileName
+          ? `${snapshot.profileName} · ${snapshot.profileDir}`
+          : '—';
+        $('fact-runtime').textContent = `dsh ${snapshot.dshVersion} · Node ${snapshot.nodeVersion} · Electron ${snapshot.electronVersion}`;
+        renderConcurrency(snapshot.concurrency);
+        if (snapshot.logs) {
+          const atBottom = $('log').scrollTop + $('log').clientHeight >= $('log').scrollHeight - 24;
+          $('log').textContent = snapshot.logs;
+          if (atBottom) $('log').scrollTop = $('log').scrollHeight;
+        }
+        const failed = snapshot.phase === 'failed';
+        $('spinner').classList.toggle('hidden', failed);
+        $('bar').classList.toggle('hidden', failed);
+        if (failed) {
+          $('btn-retry').classList.remove('hidden');
+          $('log-details').open = true;
+          $('hint').textContent = '启动失败。可重试，或查看日志定位原因。';
+        }
+      }
+
+      $('btn-retry').addEventListener('click', () => shell && shell.action('restart'));
+      $('btn-logs').addEventListener('click', () => shell && shell.action('open-logs'));
+      $('btn-quit').addEventListener('click', () => shell && shell.action('quit'));
+      $('btn-hosts').addEventListener('click', async () => {
+        if (!shell) return;
+        const button = $('btn-hosts');
+        const label = button.textContent;
+        button.disabled = true;
+        button.textContent = '检测中…';
+        try {
+          await shell.action('check-hosts');
+          render(await shell.status());
+        } finally {
+          button.disabled = false;
+          button.textContent = label;
+        }
+      });
+
+      if (shell) {
+        shell.onStatus(render);
+        shell.status().then(render);
+      }
+      slowTimer = setTimeout(() => {
+        const hint = $('hint');
+        if (hint) hint.textContent = '启动时间偏长。可展开日志查看进度；若长时间无响应，请重试。';
+        const retry = $('btn-retry');
+        if (retry) retry.classList.remove('hidden');
+      }, 20000);
+      window.addEventListener('beforeunload', () => clearTimeout(slowTimer));
+    </script>
+  </body>
+</html>

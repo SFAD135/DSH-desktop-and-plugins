@@ -1,0 +1,32 @@
+# Normalize line endings on check-in; the working tree keeps platform-native ones.
+* text=auto
+
+# ── Windows scripts keep CRLF ───────────────────────────────────────────────
+# cmd.exe misparses goto/labels when a batch file is stored with LF endings, so
+# these are pinned rather than left to autocrlf.
+*.cmd text eol=crlf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+# ── POSIX scripts keep LF ───────────────────────────────────────────────────
+*.sh text eol=lf
+
+# ── explicit text types (keeps diffs and stats honest) ──────────────────────
+*.md   text
+*.mjs  text
+*.js   text
+*.json text
+*.yml  text
+*.yaml text
+
+# ── binary: never convert, never attempt a text diff ────────────────────────
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.exe  binary
+*.dll  binary
+*.node binary
+*.zip  binary
+*.gz   binary

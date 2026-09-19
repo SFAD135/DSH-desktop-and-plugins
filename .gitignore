@@ -1,0 +1,29 @@
+# ── dependencies & build output ─────────────────────────────────────────────
+node_modules/
+dist/
+dist-installer/
+build/
+.npm-cache/
+
+# desktop/ carries its own .gitignore, which owns the paths it generates. These
+# root-level mirrors are a second line of defence: if that file is ever lost or
+# moved, the ~1.3 GB of assembled runtime still cannot reach history.
+desktop/build/
+desktop/dist/
+desktop/dist-installer/
+desktop/.npm-cache/
+desktop/node_modules/
+
+# ── release artefacts: these belong on GitHub Releases, never in git ────────
+# The packaged installer is ~153 MB, well past GitHub's 100 MB per-file limit.
+*.exe
+*.msi
+*.tar.gz
+*.zip
+*.7z
+
+# ── local noise ─────────────────────────────────────────────────────────────
+*.log
+Thumbs.db
+Desktop.ini
+.DS_Store

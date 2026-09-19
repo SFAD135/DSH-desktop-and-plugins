@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:;" />
+    <title>DeepSeek Harness — 启动失败</title>
+    <style>
+      :root {
+        --bg: #0b0f17; --panel: #121826; --line: #1f2937; --text: #e5e7eb;
+        --muted: #94a3b8; --accent: #4d6bfe; --danger: #ef4444;
+      }
+      * { box-sizing: border-box; }
+      html, body { height: 100%; margin: 0; }
+      body {
+        background: radial-gradient(1100px 620px at 50% -10%, rgba(239, 68, 68, .16), transparent 60%), var(--bg);
+        color: var(--text);
+        font: 14px/1.6 "Segoe UI", "Microsoft YaHei UI", "Microsoft YaHei", system-ui, sans-serif;
+        display: flex; align-items: center; justify-content: center;
+      }
+      .wrap { width: min(760px, 90vw); }
+      .head { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+      .badge { width: 40px; height: 40px; border-radius: 12px; background: rgba(239,68,68,.16); border: 1px solid rgba(239,68,68,.35); display: grid; place-items: center; color: #fca5a5; font-size: 20px; }
+      h1 { font-size: 18px; margin: 0; font-weight: 600; }
+      .sub { color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+      .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 20px; }
+      .title { color: #fecaca; font-weight: 600; margin-bottom: 10px; }
+      pre {
+        margin: 0; max-height: 320px; overflow: auto;
+        background: #0a0e16; border: 1px solid var(--line); border-radius: 9px;
+        padding: 12px; font: 11.5px/1.6 "Cascadia Mono", Consolas, monospace;
+        color: #9fb0c7; white-space: pre-wrap; word-break: break-all;
+        -webkit-user-select: text; user-select: text;
+      }
+      .actions { display: flex; gap: 9px; justify-content: flex-end; margin-top: 16px; flex-wrap: wrap; }
+      button {
+        font: inherit; font-size: 13px; color: var(--text); background: #1a2233;
+        border: 1px solid #273449; border-radius: 9px; padding: 8px 14px; cursor: pointer; transition: .15s;
+      }
+      button:hover { background: #223049; border-color: #3a4c6b; }
+      button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+      button.primary:hover { background: #5b76ff; }
+      .tips { margin: 14px 0 0; padding-left: 18px; color: var(--muted); font-size: 12.5px; }
+      .tips li { margin: 3px 0; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="head">
+        <div class="badge">!</div>
+        <div>
+          <h1>DeepSeek Harness 无法启动</h1>
+          <div class="sub">本地 dsh 服务没有就绪，桌面窗口无法承载界面</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="title" id="error-title">本地服务启动失败</div>
+        <pre id="error-detail">（无详细信息）</pre>
+        <ul class="tips">
+          <li>端口冲突：菜单「应用 → 端口设置…」改为自动端口后重试。</li>
+          <li>运行时缺失：在源码目录执行 <code>npm run prepare:runtime</code> 重新装配 runtime。</li>
+          <li>profile 损坏：日志里若指向 <code>%USERPROFILE%\.dsh\profiles\web</code>，可重命名该目录后重启。</li>
+        </ul>
+        <div class="actions">
+          <button id="btn-copy">复制日志</button>
+          <button id="btn-logs">打开日志文件夹</button>
+          <button id="btn-about">关于</button>
+          <button id="btn-quit">退出</button>
+          <button id="btn-retry" class="primary">重试启动</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const $ = (id) => document.getElementById(id);
+      const shell = window.dshShell;
+
+      function render(snapshot) {
+        if (!snapshot) return;
+        $('error-title').textContent = snapshot.message || '本地服务启动失败';
+        const detail = [snapshot.error, '', snapshot.logs].filter((part) => part !== undefined && part !== null && part !== '').join('\n');
+        $('error-detail').textContent = detail || '（无详细信息）';
+      }
+
+      $('btn-retry').addEventListener('click', () => shell && shell.action('restart'));
+      $('btn-copy').addEventListener('click', () => shell && shell.action('copy-logs'));
+      $('btn-logs').addEventListener('click', () => shell && shell.action('open-logs'));
+      $('btn-about').addEventListener('click', () => shell && shell.action('about'));
+      $('btn-quit').addEventListener('click', () => shell && shell.action('quit'));
+
+      if (shell) {
+        shell.onStatus(render);
+        shell.status().then(render);
+      }
+    </script>
+  </body>
+</html>
