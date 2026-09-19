@@ -1,6 +1,6 @@
 {
   "name": "dsh-session-prompt",
-  "version": "2.0.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Per-session prompt: a composer button that injects one block of user-authored text at the head of the system prompt for the current session only.",
   "type": "module",

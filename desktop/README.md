@@ -496,7 +496,7 @@ npm run build
 # 3) 核对身份真的落到了那个“拥有窗口”的进程上（任务栏与任务管理器读的就是它）
 (Get-Item 'dist\DeepSeek Harness\electron-core.exe').VersionInfo |
   Format-List ProductName, CompanyName, FileVersion
-# 期望：DeepSeek Harness / DeepSeek Harness Desktop / 0.1.5.0
+# 期望：DeepSeek Harness / DeepSeek Harness Desktop / 1.0.0.0
 
 # 4) 启动并断言“真实渲染出来的页面”。verify-gui 是**附加**到一个已运行实例上的，
 #    所以要先用调试端口把它起起来；同时确认没有别的实例在跑，否则 dist 会被锁
@@ -529,4 +529,4 @@ npm run check:residue
 
 首次启动的导入询问**已经**由 `verify:first-run` 覆盖（它断言弹窗出现、是原生 TaskDialog、给出源与目标、没有未渲染的 Markdown 标记、两个答案各自的后果，以及真实 `~/.dsh` 文件数不变）。它断言的是**文本与行为**，不是外观；改过对话框文案或布局后，用 `npm run inspect:dialog` 把渲染出的文本树打出来，或看 `build/first-run-dialogs/` 里留档的截图。
 
-版本号只有一处要改：`package.json` 的 `version`。它同时决定安装包文件名、传给 NSIS 的 `APPVERSION`，以及 exe 身份资源里的 `FileVersion`——`0.1.5-rc.2` 会在 `scripts/exe-identity.mjs` 里被归一化成 `0.1.5.0`（`AssemblyVersion` 既不接受 `-rc.2` 也不接受 `+build`）。
+版本号只有一处要改：`package.json` 的 `version`。它同时决定安装包文件名、传给 NSIS 的 `APPVERSION`，以及 exe 身份资源里的 `FileVersion`——`1.0.0` 会在 `scripts/exe-identity.mjs` 里被补齐成 `1.0.0.0`（`AssemblyVersion` 要求四段纯数字，既不接受 `-rc.2` 这类预发布后缀，也不接受 `+build` 元数据）。

@@ -5,8 +5,9 @@
  * Three things are worth pinning down here, all of them cheap to get wrong and awkward
  * to notice:
  *
- *   - the version `package.json` carries (`0.1.5-rc.2`) is not a legal `AssemblyVersion`,
- *     so it has to be normalized, and getting that wrong fails the compile;
+ *   - the version `package.json` carries is not a legal `AssemblyVersion` on its own
+ *     (it may carry a prerelease suffix, or fewer than four parts), so it has to be
+ *     normalized, and getting that wrong fails the compile;
  *   - **assembly attributes must precede every other element in a C# file** — the first
  *     version of this generator emitted them after the class and csc rejected it with
  *     CS1730, which the build reports only as a warning;

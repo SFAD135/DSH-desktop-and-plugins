@@ -1,7 +1,7 @@
 {
   "name": "dsh-desktop",
   "productName": "DeepSeek Harness",
-  "version": "0.1.5-rc.2",
+  "version": "1.0.0",
   "private": true,
   "description": "Desktop shell for DeepSeek Harness: bundled Node.js runtime + full dsh package + native WebView window",
   "main": "app/main.js",
