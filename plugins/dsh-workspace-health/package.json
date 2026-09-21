@@ -1,0 +1,24 @@
+{
+  "name": "dsh-workspace-health",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A Settings page listing every session whose working directory no longer exists on disk - the orphaned state a deleted workspace leaves behind.",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "client": {
+      "platform": "web"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.2"
+  },
+  "dependencies": {
+    "@deepseek-ai/schemastery": "^3.18.2"
+  }
+}

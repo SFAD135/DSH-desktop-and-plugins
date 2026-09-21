@@ -1,0 +1,15 @@
+{
+  "name": "dsh-orphan-write-guard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Refuse a file write that would silently recreate the directory of an orphaned session cwd — the directory a deleted workspace left behind.",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./package.json": "./package.json"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.2"
+  }
+}

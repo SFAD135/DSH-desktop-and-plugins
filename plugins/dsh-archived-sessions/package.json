@@ -1,0 +1,24 @@
+{
+  "name": "dsh-archived-sessions",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Archived sessions: a Settings section that lists archived sessions grouped by their pre-archive workspace and restores them — the missing inverse of dsh's one-way archive.",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "client": {
+      "platform": "web"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.2"
+  },
+  "dependencies": {
+    "@deepseek-ai/schemastery": "^3.18.2"
+  }
+}
